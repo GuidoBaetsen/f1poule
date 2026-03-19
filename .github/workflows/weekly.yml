@@ -1,0 +1,36 @@
+name: F1 Poule Screenshot
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'  # Elke maandag om 8:00 NL tijd
+  workflow_dispatch:       # Ook handmatig te starten
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python instellen
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Dependencies installeren
+        run: |
+          pip install requests beautifulsoup4 playwright
+          playwright install chromium
+
+      - name: Screenshot maken
+        run: python screenshot.py
+
+      - name: Bestanden opslaan
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add stand.png vorige_stand.json
+          git commit -m "Stand bijgewerkt" || echo "Geen wijzigingen"
+          git push
