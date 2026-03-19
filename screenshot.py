@@ -63,7 +63,7 @@ html = f"""<!DOCTYPE html>
     align-items: center;
     padding: 60px;
   }}
-  h1 {{ color: #e63946; font-size: 3.5em; margin-bottom: 30px; }}
+  h1 {{ color: #ffd100; font-size: 3.5em; margin-bottom: 30px; }}
   table {{ width: 900px; border-collapse: collapse; font-size: 2em; }}
   td {{ padding: 16px 24px; border-bottom: 1px solid #333; }}
   td:last-child {{ text-align: right; font-weight: bold; }}
