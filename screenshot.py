@@ -91,9 +91,7 @@ print("stand.png aangemaakt!")
 # XML aanmaken met timestamp zodat informatieschermen de cache ververst
 timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<image>
-    <url>https://{GITHUB_NAAM}.github.io/f1poule/stand.png?t={timestamp}</url>
-</image>"""
+<img src="https://{GITHUB_NAAM}.github.io/f1poule/stand.png?t={timestamp}"></img>"""
 
 with open("stand.xml", "w") as f:
     f.write(xml)
