@@ -1,13 +1,15 @@
 import requests
 import json
 import os
+from datetime import datetime
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
 STAND_FILE = "vorige_stand.json"
-url = "https://www.gppoule.nl/topscores/17283/"
+GITHUB_NAAM = "GuidoBaetsen"  # <-- Verander dit naar jouw GitHub gebruikersnaam
 
-# Data ophalen
+# Data ophalen van gppoule
+url = "https://www.gppoule.nl/topscores/17283/"
 soup = BeautifulSoup(requests.get(url).text, "html.parser")
 
 spelers = []
@@ -20,7 +22,7 @@ for rij in soup.select("a[href*='voorspellinginzien']"):
 vorige = {}
 if os.path.exists(STAND_FILE):
     with open(STAND_FILE, "r") as f:
-        vorige = json.load(f)  # {"naam": plek, ...}
+        vorige = json.load(f)
 
 # Huidige stand opslaan voor volgende keer
 huidige = {naam: int(plek) for plek, naam, _ in spelers}
@@ -32,10 +34,9 @@ rijen = ""
 kleuren = ["#FFD700", "#C0C0C0", "#CD7F32"]
 for i, (plek, naam, punten) in enumerate(spelers):
     kleur = kleuren[i] if i < 3 else "white"
-    
-    # Positieverandering berekenen
+
     if naam in vorige:
-        verschil = vorige[naam] - int(plek)  # positief = omhoog
+        verschil = vorige[naam] - int(plek)
         if verschil > 0:
             pijltje = f'<span style="color:#00cc44; font-size:0.75em; margin-left:10px">▲{verschil}</span>'
         elif verschil < 0:
@@ -80,10 +81,22 @@ with sync_playwright() as p:
     browser = p.chromium.launch()
     page = browser.new_page(viewport={"width": 1080, "height": 1920})
     page.set_content(html)
-    # Echte hoogte van de pagina meten
     hoogte = page.evaluate("document.body.scrollHeight")
     page.set_viewport_size({"width": 1080, "height": hoogte})
     page.screenshot(path="stand.png", full_page=False)
     browser.close()
 
-print("Klaar! stand.png aangemaakt.")
+print("stand.png aangemaakt!")
+
+# XML aanmaken met timestamp zodat informatieschermen de cache ververst
+timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<image>
+    <url>https://{GITHUB_NAAM}.github.io/f1poule/stand.png?t={timestamp}</url>
+</image>"""
+
+with open("stand.xml", "w") as f:
+    f.write(xml)
+
+print("stand.xml aangemaakt!")
+print("Klaar!")
